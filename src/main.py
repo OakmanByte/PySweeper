@@ -1,68 +1,69 @@
 import itertools
-import math
 
 import pygame
 
 from button import Bomb, Number, BoardItemTypes
 import random
 
-WINDOW_HEIGHT = 614
-WINDOW_WIDTH = 614
+# Initialize all the Pygame modules and prepare them for use
+from constants import WINDOW_WIDTH, WINDOW_HEIGHT, BOARD_ROWS, BOARD_COLUMNS, NUM_OF_BOARD_ITEMS, ITEM_SIZE, \
+    ITEM_SPACING
+
+pygame.init()
+
 SCREEN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-CLOCK = pygame.time.Clock()
-BOARD_HEIGHT = 512
-BOARD_WIDTH = 512
-NUM_OF_BOARD_ITEMS = 64
-OFFSET = round((WINDOW_WIDTH / 2) - (BOARD_WIDTH / 2))
-FRAME_BORDER_COLOR = (128, 128, 128)
-FRAME_BORDER_THICKNESS = 4
 pygame.display.set_caption('PySweeper v0.1')
+timer_font = pygame.font.SysFont("arial", 20)
+# Set the timer start time and current time
+start_time = pygame.time.get_ticks()
 
 
 def main():
-    pygame.init()
-    SCREEN.fill((0, 0, 0))
     game_board = populate_board_array()
     set_board_item_locations(game_board)
     is_running = True
 
     while is_running:
+        SCREEN.fill((255, 255, 255))
+        # Get the current time in seconds
+        current_time_formatted = f"Time: {(pygame.time.get_ticks() - start_time) // 1000}s"
+        # Render the timer text and blit it to the top right corner of the screen
+        timer_text = timer_font.render(current_time_formatted, True, (50, 0, 0))
+        SCREEN.blit(timer_text, (WINDOW_WIDTH - timer_text.get_width() - 10, 10))
+
         for event in pygame.event.get():
-
-            pygame.draw.rect(SCREEN,
-                             color=FRAME_BORDER_COLOR,
-                             rect=(
-                                 OFFSET, OFFSET, BOARD_WIDTH + (FRAME_BORDER_THICKNESS * 2),
-                                 BOARD_HEIGHT + (FRAME_BORDER_THICKNESS * 2)),
-                             width=4)
-
-            for board_item in game_board:
-                board_item.draw(SCREEN, outline=True)
-
             if event.type == pygame.QUIT:
                 is_running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_presses = pygame.mouse.get_pressed()
-                if mouse_presses[0]:
+                # left and right mouse click respectively
+                if mouse_presses[0] | mouse_presses[2]:
                     mouse_pos = pygame.mouse.get_pos()
                     for board_item in game_board:
                         if board_item.is_over(mouse_pos):
-                            board_item.reveal()
+                            if mouse_presses[0]:
+                                board_item.reveal()
+                            else:
+                                board_item.set_flag()
                             # print("Game over")
                             # is_running = False  # Set isRunning to False when game over
+
+        for board_item in game_board:
+            board_item.draw(SCREEN, outline=True)
 
         pygame.display.update()
 
     pygame.quit()  # Quit Pygame outside the loop
 
 
-def populate_board_array(number_of_bombs: int = 5):
+def populate_board_array(number_of_bombs: int = 16):
     # Generate randomized locations for the bombs
     bomb_locations: list[tuple[int, int]] = [(x, y) for x, y in
-                                             random.sample([(i, j) for i in range(8) for j in range(8)],
-                                                           number_of_bombs)]
+                                             random.sample(
+                                                 [(i, j) for i in range(BOARD_ROWS) for j in range(BOARD_COLUMNS)],
+                                                 number_of_bombs)]
 
-    board: list[list[Number | Bomb]] = [[Number() for _ in range(8)] for _ in range(8)]
+    board: list[list[Number | Bomb]] = [[Number() for _ in range(BOARD_ROWS)] for _ in range(BOARD_COLUMNS)]
 
     # Populate with Bombs
     for bomb_location in bomb_locations:
@@ -90,12 +91,12 @@ def populate_board_array(number_of_bombs: int = 5):
         (1, -1),
         (1, 1)
     ]
-    for row in range(8):
-        for column in range(8):
+    for row in range(BOARD_ROWS):
+        for column in range(BOARD_COLUMNS):
             if board[row][column].type == BoardItemTypes.NUMBER:
                 board[row][column].bomb_count = sum(
                     board[row + r][column + c].type == BoardItemTypes.BOMB for r, c in neighbour_indices if
-                    0 <= row + r < 8 and 0 <= column + c < 8
+                    0 <= row + r < BOARD_ROWS and 0 <= column + c < BOARD_COLUMNS
                 )
 
     # Flatten the list of lists into a single list
@@ -105,14 +106,12 @@ def populate_board_array(number_of_bombs: int = 5):
 
 
 def set_board_item_locations(game_board):
-    spacing = 5
-    size = BOARD_HEIGHT // math.sqrt(NUM_OF_BOARD_ITEMS)
     for i in range(NUM_OF_BOARD_ITEMS):
-        row = i // 8
-        col = i % 8
-        x = (col * size) + spacing
-        y = (row * size) + spacing
-        game_board[i].set_pos(x=x + OFFSET, y=y + OFFSET)
+        row = i // BOARD_ROWS
+        col = i % BOARD_COLUMNS
+        x = (col * ITEM_SIZE) + ITEM_SPACING
+        y = (row * ITEM_SIZE) + ITEM_SPACING
+        game_board[i].set_pos(x=x, y=y)
 
 
 if __name__ == '__main__':
