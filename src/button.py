@@ -66,10 +66,11 @@ class Number(BoardItem):
         if outline:
             pygame.draw.rect(screen, color=(0, 0, 0), rect=(self.x, self.y, self.width, self.height), width=1)
 
-        #font = pygame.font.SysFont("arial", 24)
-        #img = font.render(str(self.bomb_count), True, "black")
-        #screen.blit(img, (self.x + self.width / 2, self.y + self.height / 2))
+        font = pygame.font.SysFont("arial", 24)
+        img = font.render(str(self.bomb_count), True, "black")
+        screen.blit(img, (self.x + self.width / 2, self.y + self.height / 2))
 
-    def reveal(self):
-        self.hidden = False
-        self.color = "green"
+
+def reveal(self):
+    self.hidden = False
+    self.color = "green"

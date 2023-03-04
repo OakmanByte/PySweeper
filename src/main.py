@@ -3,7 +3,7 @@ import math
 
 import pygame
 
-from button import Bomb, Number
+from button import Bomb, Number, BoardItemTypes
 import random
 
 WINDOW_HEIGHT = 614
@@ -57,17 +57,46 @@ def main():
 
 
 def populate_board_array(number_of_bombs: int = 5):
+    # Generate randomized locations for the bombs
     bomb_locations: list[tuple[int, int]] = [(x, y) for x, y in
                                              random.sample([(i, j) for i in range(8) for j in range(8)],
                                                            number_of_bombs)]
 
     board: list[list[Number | Bomb]] = [[Number() for _ in range(8)] for _ in range(8)]
 
-    # Calculate neighbouring bombs for each number item
-    # TODO
-
+    # Populate with Bombs
     for bomb_location in bomb_locations:
         board[bomb_location[0]][bomb_location[1]] = Bomb()
+
+    # Calculate neighbouring bombs for each number item
+    '''
+    Consider location = [R][C]. Then the 8 neighbours are:
+    [R-1][C]
+    [R+1][C]
+    [R][C-1]
+    [R][C+1]
+    [R-1][C-1]
+    [R-1][C+1]
+    [R+1][C-1]
+    [R+1][C+1]
+    '''
+    neighbour_indices = [
+        (-1, 0),
+        (1, 0),
+        (0, -1),
+        (0, 1),
+        (-1, -1),
+        (-1, 1),
+        (1, -1),
+        (1, 1)
+    ]
+    for row in range(8):
+        for column in range(8):
+            if board[row][column].type == BoardItemTypes.NUMBER:
+                board[row][column].bomb_count = sum(
+                    board[row + r][column + c].type == BoardItemTypes.BOMB for r, c in neighbour_indices if
+                    0 <= row + r < 8 and 0 <= column + c < 8
+                )
 
     # Flatten the list of lists into a single list
     flat_board_items = list(itertools.chain(*board))
