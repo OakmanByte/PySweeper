@@ -83,4 +83,5 @@ class Number(BoardItem):
 
 def reveal(self):
     self.hidden = False
+    # TODO: Not working currently
     self.color = "green"
