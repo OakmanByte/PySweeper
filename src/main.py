@@ -1,19 +1,22 @@
 import pygame
 
-from constants import GameState
+from constants import GameState, SCREEN
 from game import Game
+from main_menu import MainMenu
 from state_machine import state
 
 
 def main():
-    # Initialize game class and board
+    # Initialize classes
+    main_menu = MainMenu()
     game = Game()
     while state.get_state() != GameState.EXIT:
+        SCREEN.fill((255, 255, 255))
         match state.get_state():
             case GameState.MENU:
-                game.run_game()
+                main_menu.render()
             case GameState.GAME:
-                game.run_game()
+                game.run()
             case _:
                 state.set_state(GameState.EXIT)
         pygame.display.update()

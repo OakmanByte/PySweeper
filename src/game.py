@@ -3,12 +3,12 @@ from dataclasses import dataclass
 
 import pygame
 
-from button import Bomb, Number, BoardItemTypes
+from classes import Bomb, Number, BoardItemTypes
 import random
 
 # Initialize all the Pygame modules and prepare them for use
 from constants import WINDOW_WIDTH, BOARD_ROWS, BOARD_COLUMNS, NUM_OF_BOARD_ITEMS, ITEM_SIZE, \
-    ITEM_SPACING, SCREEN, timer_font, GameState
+    ITEM_SPACING, timer_font, GameState, SCREEN, SCREEN
 from state_machine import state
 
 start_time = pygame.time.get_ticks()
@@ -16,14 +16,14 @@ start_time = pygame.time.get_ticks()
 
 @dataclass
 class Game:
+    frame: pygame.Rect = None
     board: list = None
 
     def __post_init__(self):
         self.board = self.populate_board_array()
         self.set_board_item_locations()
 
-    def run_game(self):
-        SCREEN.fill((255, 255, 255))
+    def run(self):
         # Get the current time in seconds
         current_time_formatted = f"Time: {(pygame.time.get_ticks() - start_time) // 1000}s"
         # Render the timer text and blit it to the top right corner of the screen
@@ -49,7 +49,7 @@ class Game:
             board_item.draw(SCREEN, outline=True)
 
     @staticmethod
-    def populate_board_array(number_of_bombs: int = 16):
+    def populate_board_array(number_of_bombs: int = 40):
         # Generate randomized locations for the bombs
         bomb_locations: list[tuple[int, int]] = [(x, y) for x, y in
                                                  random.sample(
