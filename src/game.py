@@ -2,13 +2,14 @@ import itertools
 from dataclasses import dataclass
 
 import pygame
+from pygame import Surface
 
 from classes import Bomb, Number, BoardItemTypes
 import random
 
 # Initialize all the Pygame modules and prepare them for use
 from constants import WINDOW_WIDTH, BOARD_ROWS, BOARD_COLUMNS, NUM_OF_BOARD_ITEMS, ITEM_SIZE, \
-    ITEM_SPACING, timer_font, GameState, SCREEN, SCREEN
+    GameState, GAME_X, GAME_Y
 from state_machine import state
 
 start_time = pygame.time.get_ticks()
@@ -16,7 +17,8 @@ start_time = pygame.time.get_ticks()
 
 @dataclass
 class Game:
-    frame: pygame.Rect = None
+    window: Surface
+    border: pygame.Rect = None
     board: list = None
 
     def __post_init__(self):
@@ -24,11 +26,8 @@ class Game:
         self.set_board_item_locations()
 
     def run(self):
-        # Get the current time in seconds
-        current_time_formatted = f"Time: {(pygame.time.get_ticks() - start_time) // 1000}s"
-        # Render the timer text and blit it to the top right corner of the screen
-        timer_text = timer_font.render(current_time_formatted, True, (50, 0, 0))
-        SCREEN.blit(timer_text, (WINDOW_WIDTH - timer_text.get_width() - 10, 10))
+        self.render_boarder()
+        self.render_timer()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -46,7 +45,7 @@ class Game:
                                 board_item.set_flag()
 
         for board_item in self.board:
-            board_item.draw(SCREEN, outline=True)
+            board_item.draw(self.window, outline=True)
 
     @staticmethod
     def populate_board_array(number_of_bombs: int = 40):
@@ -101,6 +100,18 @@ class Game:
         for i in range(NUM_OF_BOARD_ITEMS):
             row = i // BOARD_ROWS
             col = i % BOARD_COLUMNS
-            x = (col * ITEM_SIZE) + ITEM_SPACING
-            y = (row * ITEM_SIZE) + ITEM_SPACING
+            x = (col * ITEM_SIZE) + GAME_X
+            y = (row * ITEM_SIZE) + GAME_Y
             self.board[i].set_pos(x=x, y=y)
+
+    def render_boarder(self):
+        pygame.draw.rect(self.window, "black", self.window.get_rect(), 2)
+
+    def render_timer(self):
+        # Get the current time in seconds
+        current_time_formatted = f"Time: {(pygame.time.get_ticks() - start_time) // 1000}s"
+        # Render the timer text and blit it to the top right corner of the screen
+        timer_font = pygame.font.SysFont("arial", 20)
+
+        timer_text = timer_font.render(current_time_formatted, True, (50, 0, 0))
+        self.window.blit(timer_text, (WINDOW_WIDTH - timer_text.get_width() - 10, 10))
