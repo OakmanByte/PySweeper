@@ -1,22 +1,21 @@
-from dataclasses import dataclass
-
 import pygame
 from pygame import Surface
 
-from classes import MenuButton
-from constants import GameState, WINDOW_WIDTH, WINDOW_HEIGHT
+from classes import TextButton
+from constants import GameState, WINDOW_WIDTH, WINDOW_HEIGHT, BLACK, SHADOW, TITLE_FONT
 from state_machine import state
 
 
 class MainMenu:
     window: Surface
-    __start_button: MenuButton
-    __quite_button: MenuButton
+    __start_button: TextButton
+    __options_button: TextButton
+    __quite_button: TextButton
     title: str = "Welcome to PySweeper!"
 
     def __init__(self, window):
         self.window = window
-        self.create_elements()
+        self.create_buttons()
 
     def render(self):
         for event in pygame.event.get():
@@ -31,20 +30,28 @@ class MainMenu:
                     if self.__start_button.is_over(mouse_position):
                         state.set_state(GameState.GAME)
         self.__start_button.draw(self.window)
+        self.__options_button.draw(self.window)
         self.__quite_button.draw(self.window)
         self.render_title()
 
-    def create_elements(self):
+    def create_buttons(self):
+        # Middle of screen
+        button_x = (WINDOW_WIDTH // 2) - (TextButton.width // 2)
+        button_y_top = WINDOW_HEIGHT * 0.3
+        button_spacing = TextButton.height + 50
 
         self.__start_button = (
-            MenuButton(x=(WINDOW_WIDTH // 2) - (MenuButton.width // 2), y=WINDOW_HEIGHT // 4, color="gray",
-                       button_text="Start"))
+            TextButton(x=button_x, y=button_y_top, button_text="Start"))
+        self.__options_button = (
+            TextButton(x=button_x, y=button_y_top + button_spacing, button_text="Options"))
         self.__quite_button = (
-            MenuButton(x=(WINDOW_WIDTH // 2) - (MenuButton.width // 2), y=WINDOW_HEIGHT // 3, color="gray",
-                       button_text="Quit"))
+            TextButton(x=button_x, y=button_y_top + (2 * button_spacing), button_text="Quit"))
 
     def render_title(self):
-        title_font = pygame.font.SysFont("arial", 40)
+        # render the text using the custom font
+        title_text = TITLE_FONT.render(self.title, True, BLACK)
+        title_text_shadow = TITLE_FONT.render(self.title, True, SHADOW)
+        self.window.blit(title_text_shadow,
+                         (((WINDOW_WIDTH // 2) - title_text.get_width() // 2) + 3, (WINDOW_HEIGHT // 20) - 3))
 
-        title_text = title_font.render(self.title, True, "gray")
-        self.window.blit(title_text, ((WINDOW_WIDTH // 2) - title_text.get_width() // 2, WINDOW_HEIGHT//20))
+        self.window.blit(title_text, ((WINDOW_WIDTH // 2) - title_text.get_width() // 2, WINDOW_HEIGHT // 20))

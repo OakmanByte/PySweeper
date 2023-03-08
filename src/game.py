@@ -9,7 +9,7 @@ import random
 
 # Initialize all the Pygame modules and prepare them for use
 from constants import WINDOW_WIDTH, BOARD_ROWS, BOARD_COLUMNS, NUM_OF_BOARD_ITEMS, ITEM_SIZE, \
-    GameState, GAME_X, GAME_Y
+    GameState, GAME_X, GAME_Y, BLACK, TIMER_FONT
 from state_machine import state
 
 start_time = pygame.time.get_ticks()
@@ -105,13 +105,11 @@ class Game:
             self.board[i].set_pos(x=x, y=y)
 
     def render_boarder(self):
-        pygame.draw.rect(self.window, "black", self.window.get_rect(), 2)
+        pygame.draw.rect(self.window, BLACK, self.window.get_rect(), 2)
 
     def render_timer(self):
         # Get the current time in seconds
         current_time_formatted = f"Time: {(pygame.time.get_ticks() - start_time) // 1000}s"
-        # Render the timer text and blit it to the top right corner of the screen
-        timer_font = pygame.font.SysFont("arial", 20)
 
-        timer_text = timer_font.render(current_time_formatted, True, (50, 0, 0))
+        timer_text = TIMER_FONT.render(current_time_formatted, True, (50, 0, 0))
         self.window.blit(timer_text, (WINDOW_WIDTH - timer_text.get_width() - 10, 10))
