@@ -12,6 +12,7 @@ from constants import WINDOW_WIDTH, BOARD_ROWS, BOARD_COLUMNS, NUM_OF_BOARD_ITEM
     GameState, GAME_X, GAME_Y, BLACK, TIMER_FONT
 from state_machine import state
 
+# TODO Fix timer so it docent start when program starts and when restarting or going to main menu
 start_time = pygame.time.get_ticks()
 
 
@@ -50,10 +51,8 @@ class Game:
     @staticmethod
     def populate_board_array(number_of_bombs: int = 40):
         # Generate randomized locations for the bombs
-        bomb_locations: list[tuple[int, int]] = [(x, y) for x, y in
-                                                 random.sample(
-                                                     [(i, j) for i in range(BOARD_ROWS) for j in range(BOARD_COLUMNS)],
-                                                     number_of_bombs)]
+        bomb_locations: list[tuple[int, int]] = list(
+            random.sample([(i, j) for i in range(BOARD_ROWS) for j in range(BOARD_COLUMNS)], number_of_bombs))
 
         board: list[list[Number | Bomb]] = [[Number() for _ in range(BOARD_ROWS)] for _ in range(BOARD_COLUMNS)]
 
@@ -113,3 +112,7 @@ class Game:
 
         timer_text = TIMER_FONT.render(current_time_formatted, True, (50, 0, 0))
         self.window.blit(timer_text, (WINDOW_WIDTH - timer_text.get_width() - 10, 10))
+
+    # TODO: Better way?
+    def reset_board(self):
+        self.__post_init__()

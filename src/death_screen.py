@@ -3,18 +3,21 @@ from pygame import Surface
 
 from classes import TextButton
 from constants import GameState, WINDOW_WIDTH, WINDOW_HEIGHT, BLACK, SHADOW, TITLE_FONT
+from game import Game
 from state_machine import state
 
 
-class MainMenu:
+class DeathScreen:
     window: Surface
-    __start_button: TextButton
-    __options_button: TextButton
-    __quit_button: TextButton
-    title: str = "Welcome to PySweeper!"
+    game: Game
+    __restart_button: TextButton
+    __main_menu: TextButton
+    __quite_button: TextButton
+    title: str = "GAME OVER"
 
-    def __init__(self, window):
+    def __init__(self, window, game):
         self.window = window
+        self.game = game
         self.create_buttons()
 
     def render(self):
@@ -25,13 +28,17 @@ class MainMenu:
                 mouse_presses = pygame.mouse.get_pressed()
                 if mouse_presses[0]:
                     mouse_position = pygame.mouse.get_pos()
-                    if self.__quit_button.is_over(mouse_position):
-                        state.set_state(GameState.EXIT)
-                    if self.__start_button.is_over(mouse_position):
+                    if self.__restart_button.is_over(mouse_position):
+                        self.game.reset_board()
                         state.set_state(GameState.GAME)
-        self.__start_button.draw(self.window)
-        self.__options_button.draw(self.window)
-        self.__quit_button.draw(self.window)
+                    if self.__main_menu.is_over(mouse_position):
+                        self.game.reset_board()
+                        state.set_state(GameState.MENU)
+                    if self.__quite_button.is_over(mouse_position):
+                        state.set_state(GameState.EXIT)
+        self.__restart_button.draw(self.window)
+        self.__main_menu.draw(self.window)
+        self.__quite_button.draw(self.window)
         self.render_title()
 
     def create_buttons(self):
@@ -40,11 +47,11 @@ class MainMenu:
         button_y_top = WINDOW_HEIGHT * 0.3
         button_spacing = TextButton.height + 50
 
-        self.__start_button = (
-            TextButton(x=button_x, y=button_y_top, button_text="Start"))
-        self.__options_button = (
-            TextButton(x=button_x, y=button_y_top + button_spacing, button_text="Options"))
-        self.__quit_button = (
+        self.__restart_button = (
+            TextButton(x=button_x, y=button_y_top, button_text="Restart"))
+        self.__main_menu = (
+            TextButton(x=button_x, y=button_y_top + button_spacing, button_text="Menu"))
+        self.__quite_button = (
             TextButton(x=button_x, y=button_y_top + (2 * button_spacing), button_text="Quit"))
 
     def render_title(self):

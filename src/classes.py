@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Tuple
 import pygame
+from pygame import Surface, Rect
 from pygame.font import Font
 
 from constants import ITEM_SIZE, GameState, BLACK, WHITE, BUTTON_FONT, NUMBER_BOARD_ITEM_FONT
@@ -73,7 +74,15 @@ class BoardItem:
         self.hidden = False
 
     def set_flag(self):
-        self.flagged = not self.flagged
+        if self.hidden:
+            self.flagged = not self.flagged
+
+    def get_flag_image_and_location(self) -> Tuple[Surface, Rect]:
+        # Load the image
+        flag_image = pygame.image.load('flag.svg')
+        img_rect = flag_image.get_rect(center=(self.x + self.size / 2, self.y + self.size / 2))
+        # Draw the image onto the screen
+        return flag_image, img_rect
 
 
 @dataclass
@@ -85,16 +94,13 @@ class Bomb(BoardItem):
         if outline:
             pygame.draw.rect(screen, color=BLACK, rect=(self.x, self.y, self.size, self.size), width=1)
         if self.flagged:
-            # Load the image
-            image = pygame.image.load('box.svg')
-
-            # Draw the image onto the screen
-            screen.blit(image, (self.x + self.size / 2, self.y + self.size / 2))
+            screen.blit(*self.get_flag_image_and_location())
 
     def reveal(self):
-        self.hidden = False
-        self.color = "red"
-        state.set_state(GameState.MENU)
+        if not self.flagged:
+            self.hidden = False
+            self.color = "red"
+            state.set_state(GameState.GAME_OVER)
 
 
 @dataclass
@@ -104,15 +110,17 @@ class Number(BoardItem):
     font: Font = NUMBER_BOARD_ITEM_FONT
 
     def draw(self, screen, outline: bool = False):
-
         pygame.draw.rect(screen, color=self.color, rect=(self.x, self.y, self.size, self.size))
         if outline:
             pygame.draw.rect(screen, color=BLACK, rect=(self.x, self.y, self.size, self.size), width=1)
         if not self.hidden:
-            img = self.font.render(str(self.bomb_count), True, BLACK)
-            # TODO: Location of number to be right in middle
-            screen.blit(img, (self.x + self.size / 2, self.y + self.size - self.font.get_height()))
+            bombs_count_img = self.font.render(str(self.bomb_count), True, BLACK)
+            img_rect = bombs_count_img.get_rect(center=(self.x + self.size / 2, self.y + self.size / 2))
+            screen.blit(bombs_count_img, img_rect)
+        if self.flagged:
+            screen.blit(*self.get_flag_image_and_location())
 
     def reveal(self):
-        self.hidden = False
-        self.color = "green"
+        if not self.flagged:
+            self.hidden = False
+            self.color = "green"

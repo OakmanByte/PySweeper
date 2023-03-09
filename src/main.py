@@ -1,6 +1,7 @@
 import pygame
 
-from constants import GameState, WINDOW_WIDTH, WINDOW_HEIGHT, GAME_WIDTH, GAME_HEIGHT, BACKGROUND
+from constants import GameState, WINDOW_WIDTH, WINDOW_HEIGHT, BACKGROUND
+from death_screen import DeathScreen
 from game import Game
 from main_menu import MainMenu
 from state_machine import state
@@ -13,6 +14,7 @@ def main():
     # Initialize classes
     main_menu = MainMenu(main_window)
     game = Game(window=main_window)
+    death_screen = DeathScreen(window=main_window, game=game)
 
     while state.get_state() != GameState.EXIT:
         # Blit the game window onto the screen
@@ -22,6 +24,8 @@ def main():
                 main_menu.render()
             case GameState.GAME:
                 game.run()
+            case GameState.GAME_OVER:
+                death_screen.render()
             case _:
                 state.set_state(GameState.EXIT)
         # Update the display

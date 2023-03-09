@@ -7,6 +7,7 @@ import pygame
 class GameState(Enum):
     GAME: str = "Game"
     MENU: str = "MENU"
+    GAME_OVER: str = "GAME_OVER"
     EXIT: str = "EXIT"
 
 
