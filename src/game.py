@@ -4,16 +4,14 @@ from dataclasses import dataclass
 import pygame
 from pygame import Surface
 
+from GameTimer import GameTimer, timer
 from classes import Bomb, Number, BoardItemTypes
 import random
 
 # Initialize all the Pygame modules and prepare them for use
-from constants import WINDOW_WIDTH, BOARD_ROWS, BOARD_COLUMNS, NUM_OF_BOARD_ITEMS, ITEM_SIZE, \
+from constants import WINDOW_WIDTH, board_rows, board_columns, num_of_board_items, item_size, \
     GameState, GAME_X, GAME_Y, BLACK, TIMER_FONT
 from state_machine import state
-
-# TODO Fix timer so it docent start when program starts and when restarting or going to main menu
-start_time = pygame.time.get_ticks()
 
 
 @dataclass
@@ -21,9 +19,10 @@ class Game:
     window: Surface
     border: pygame.Rect = None
     board: list = None
+    number_of_bombs: int = 40
 
     def __post_init__(self):
-        self.board = self.populate_board_array()
+        self.board = self.populate_board_array(self.number_of_bombs)
         self.set_board_item_locations()
 
     def run(self):
@@ -42,6 +41,8 @@ class Game:
                         if board_item.is_over(mouse_pos):
                             if mouse_presses[0]:
                                 board_item.reveal()
+                                if board_item.type == BoardItemTypes.NUMBER:
+                                    self.check_win_condition()
                             else:
                                 board_item.set_flag()
 
@@ -49,12 +50,12 @@ class Game:
             board_item.draw(self.window, outline=True)
 
     @staticmethod
-    def populate_board_array(number_of_bombs: int = 40):
+    def populate_board_array(number_of_bombs: int):
         # Generate randomized locations for the bombs
         bomb_locations: list[tuple[int, int]] = list(
-            random.sample([(i, j) for i in range(BOARD_ROWS) for j in range(BOARD_COLUMNS)], number_of_bombs))
+            random.sample([(i, j) for i in range(board_rows) for j in range(board_columns)], number_of_bombs))
 
-        board: list[list[Number | Bomb]] = [[Number() for _ in range(BOARD_ROWS)] for _ in range(BOARD_COLUMNS)]
+        board: list[list[Number | Bomb]] = [[Number() for _ in range(board_rows)] for _ in range(board_columns)]
 
         # Populate with Bombs
         for bomb_location in bomb_locations:
@@ -82,12 +83,12 @@ class Game:
             (1, -1),
             (1, 1)
         ]
-        for row in range(BOARD_ROWS):
-            for column in range(BOARD_COLUMNS):
+        for row in range(board_rows):
+            for column in range(board_columns):
                 if board[row][column].type == BoardItemTypes.NUMBER:
                     board[row][column].bomb_count = sum(
                         board[row + r][column + c].type == BoardItemTypes.BOMB for r, c in neighbour_indices if
-                        0 <= row + r < BOARD_ROWS and 0 <= column + c < BOARD_COLUMNS
+                        0 <= row + r < board_rows and 0 <= column + c < board_columns
                     )
 
         # Flatten the list of lists into a single list
@@ -96,23 +97,27 @@ class Game:
         return flat_board_items
 
     def set_board_item_locations(self):
-        for i in range(NUM_OF_BOARD_ITEMS):
-            row = i // BOARD_ROWS
-            col = i % BOARD_COLUMNS
-            x = (col * ITEM_SIZE) + GAME_X
-            y = (row * ITEM_SIZE) + GAME_Y
+        for i in range(num_of_board_items):
+            row = i // board_rows
+            col = i % board_columns
+            x = (col * item_size) + GAME_X
+            y = (row * item_size) + GAME_Y
             self.board[i].set_pos(x=x, y=y)
 
     def render_boarder(self):
         pygame.draw.rect(self.window, BLACK, self.window.get_rect(), 2)
 
     def render_timer(self):
-        # Get the current time in seconds
-        current_time_formatted = f"Time: {(pygame.time.get_ticks() - start_time) // 1000}s"
-
-        timer_text = TIMER_FONT.render(current_time_formatted, True, (50, 0, 0))
+        timer_text = TIMER_FONT.render(timer.get_elapsed_time_str_formatted(), True, (50, 0, 0))
         self.window.blit(timer_text, (WINDOW_WIDTH - timer_text.get_width() - 10, 10))
 
     # TODO: Better way?
     def reset_board(self):
         self.__post_init__()
+
+    def check_win_condition(self):
+        for board_item in self.board:
+            if board_item.type == BoardItemTypes.NUMBER and board_item.hidden:
+                return False
+
+        state.set_state(GameState.MENU)

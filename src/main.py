@@ -13,7 +13,7 @@ def main():
 
     # Initialize classes
     main_menu = MainMenu(main_window)
-    game = Game(window=main_window)
+    game = Game(window=main_window, number_of_bombs=0)
     death_screen = DeathScreen(window=main_window, game=game)
 
     while state.get_state() != GameState.EXIT:

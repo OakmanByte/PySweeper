@@ -23,15 +23,16 @@ GAME_X = (WINDOW_WIDTH - GAME_WIDTH) // 2  # X-coordinate of the game window
 GAME_Y = (WINDOW_HEIGHT - GAME_HEIGHT) // 2  # Y-coordinate of the game window
 
 # Calculated values
-BOARD_DIMENSION = "16x16"
-NUM_OF_BOARD_ITEMS = eval(BOARD_DIMENSION.replace("x", "*"))
-BOARD_ROWS, BOARD_COLUMNS = map(int, BOARD_DIMENSION.split("x"))
-ITEM_SIZE = (GAME_WIDTH // BOARD_ROWS)
+board_dimension = "8x8"
+num_of_board_items = eval(board_dimension.replace("x", "*"))
+board_rows, board_columns = map(int, board_dimension.split("x"))
+item_size = (GAME_WIDTH // board_rows)
 
 # Fonts
 FONT_PATH = "fonts/TranscendsGames.otf"
 TITLE_FONT = pygame.font.Font(FONT_PATH, 60)
 BUTTON_FONT = pygame.font.Font(FONT_PATH, 20)
+RADIO_BUTTON_FONT = pygame.font.Font(FONT_PATH, 5)
 TIMER_FONT = pygame.font.Font(FONT_PATH, 15)
 NUMBER_BOARD_ITEM_FONT = pygame.font.Font(FONT_PATH, 25)
 

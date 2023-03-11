@@ -5,7 +5,7 @@ import pygame
 from pygame import Surface, Rect
 from pygame.font import Font
 
-from constants import ITEM_SIZE, GameState, BLACK, WHITE, BUTTON_FONT, NUMBER_BOARD_ITEM_FONT
+from constants import item_size, GameState, BLACK, WHITE, BUTTON_FONT, NUMBER_BOARD_ITEM_FONT, RADIO_BUTTON_FONT
 from state_machine import state
 
 
@@ -22,6 +22,7 @@ class TextButton:
     font: Font = BUTTON_FONT
     width: int = 150
     height: int = 100
+    border_radius: int = 20
     color: Tuple[int, int, int] | str = WHITE
 
     def draw(self, surface: pygame.Surface):
@@ -29,7 +30,7 @@ class TextButton:
         button_rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
         # Draw the button
-        pygame.draw.rect(surface, self.color, button_rect, border_radius=20)
+        pygame.draw.rect(surface, self.color, button_rect, border_radius=self.border_radius)
 
         # Draw the button text
         if self.button_text:
@@ -43,13 +44,33 @@ class TextButton:
         return button_rect.collidepoint(mouse_position)
 
 
+class RadioButton(TextButton):
+    clicked: bool = False
+    border_radius = 260
+    font = RADIO_BUTTON_FONT
+
+    def __init__(self, x: int, y: int, button_text: str, width: int = 80, height: int = 40, border_radius: int = 250):
+        super().__init__(x, y, button_text, width=width, height=height, border_radius=border_radius)
+
+
+class RadioButtonGroup:
+    buttons: [RadioButton]
+
+    def __init__(self, buttons: [RadioButton]):
+        self.buttons = buttons
+
+    def draw(self, surface: pygame.Surface):
+        for button in self.buttons:
+            button.draw(surface)
+
+
 @dataclass
 class BoardItem:
     type: BoardItemTypes
     hidden: bool = True
     x: int = 0
     y: int = 0
-    size: int = ITEM_SIZE
+    size: int = item_size
     color: Tuple[int, int, int] | str = WHITE
     flagged: bool = False
 
@@ -106,7 +127,7 @@ class Bomb(BoardItem):
 @dataclass
 class Number(BoardItem):
     type: BoardItemTypes = BoardItemTypes.NUMBER
-    bomb_count: int = 5
+    bomb_count: int = 0
     font: Font = NUMBER_BOARD_ITEM_FONT
 
     def draw(self, screen, outline: bool = False):
