@@ -12,25 +12,26 @@ def main():
     main_window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
     # Initialize classes
-    main_menu = MainMenu(main_window)
-    game = Game(window=main_window, number_of_bombs=0)
+    main_menu = MainMenu(main_window, "Welcome to PySweeper!")
+    game = Game(window=main_window, number_of_bombs=29)
     death_screen = DeathScreen(window=main_window, game=game)
 
     while state.get_state() != GameState.EXIT:
-        # Blit the game window onto the screen
-        main_window.fill(BACKGROUND)
-        match state.get_state():
-            case GameState.MENU:
-                main_menu.render()
-            case GameState.GAME:
-                game.run()
-            case GameState.GAME_OVER:
-                death_screen.render()
-            case _:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
                 state.set_state(GameState.EXIT)
-        # Update the display
-        pygame.display.update()
-
+            else:
+                main_window.fill(BACKGROUND)
+                match state.get_state():
+                    case GameState.MENU:
+                        main_menu.render(event)
+                    case GameState.GAME:
+                        game.run(event)
+                    case GameState.GAME_OVER:
+                        death_screen.render(event)
+                    case _:
+                        state.set_state(GameState.EXIT)
+            pygame.display.update()
     pygame.quit()
 
 

@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import Tuple
+from typing import Tuple, Optional, Callable
 import pygame
 from pygame import Surface, Rect
 from pygame.font import Font
 
-from constants import item_size, GameState, BLACK, WHITE, BUTTON_FONT, NUMBER_BOARD_ITEM_FONT, RADIO_BUTTON_FONT
+from constants import item_size, GameState, BLACK, WHITE, BUTTON_FONT, NUMBER_BOARD_ITEM_FONT
 from state_machine import state
 
 
@@ -24,6 +24,7 @@ class TextButton:
     height: int = 100
     border_radius: int = 20
     color: Tuple[int, int, int] | str = WHITE
+    on_click_func: Optional[Callable[[], None]] = None
 
     def draw(self, surface: pygame.Surface):
         # Define the button rectangle
@@ -39,29 +40,17 @@ class TextButton:
             text_y = button_rect.y + (button_rect.height - button_text_surface.get_height()) // 2
             surface.blit(button_text_surface, (text_x, text_y))
 
-    def is_over(self, mouse_position: Tuple[int, int]) -> bool:
+    def is_over(self, mouse_position: Tuple[int, int]):
         button_rect = pygame.Rect(self.x, self.y, self.width, self.height)
-        return button_rect.collidepoint(mouse_position)
+        if button_rect.collidepoint(mouse_position):
+            self.on_click()
 
+    def on_click(self):
+        if self.on_click_func:
+            self.on_click_func()
 
-class RadioButton(TextButton):
-    clicked: bool = False
-    border_radius = 260
-    font = RADIO_BUTTON_FONT
-
-    def __init__(self, x: int, y: int, button_text: str, width: int = 80, height: int = 40, border_radius: int = 250):
-        super().__init__(x, y, button_text, width=width, height=height, border_radius=border_radius)
-
-
-class RadioButtonGroup:
-    buttons: [RadioButton]
-
-    def __init__(self, buttons: [RadioButton]):
-        self.buttons = buttons
-
-    def draw(self, surface: pygame.Surface):
-        for button in self.buttons:
-            button.draw(surface)
+    def set_on_click(self, func: Optional[Callable[[], None]]):
+        self.on_click_func = func
 
 
 @dataclass

@@ -3,8 +3,9 @@ from dataclasses import dataclass
 
 import pygame
 from pygame import Surface
+from pygame.event import Event
 
-from GameTimer import GameTimer, timer
+from GameTimer import timer
 from classes import Bomb, Number, BoardItemTypes
 import random
 
@@ -22,35 +23,31 @@ class Game:
     number_of_bombs: int = 40
 
     def __post_init__(self):
-        self.board = self.populate_board_array(self.number_of_bombs)
+        self.populate_board_array(self.number_of_bombs)
         self.set_board_item_locations()
 
-    def run(self):
+    def run(self, event: Event):
         self.render_boarder()
         self.render_timer()
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                state.set_state(GameState.EXIT)
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_presses = pygame.mouse.get_pressed()
-                # left and right mouse click respectively
-                if mouse_presses[0] | mouse_presses[2]:
-                    mouse_pos = pygame.mouse.get_pos()
-                    for board_item in self.board:
-                        if board_item.is_over(mouse_pos):
-                            if mouse_presses[0]:
-                                board_item.reveal()
-                                if board_item.type == BoardItemTypes.NUMBER:
-                                    self.check_win_condition()
-                            else:
-                                board_item.set_flag()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_presses = pygame.mouse.get_pressed()
+            # left and right mouse click respectively
+            if mouse_presses[0] | mouse_presses[2]:
+                mouse_pos = pygame.mouse.get_pos()
+                for board_item in self.board:
+                    if board_item.is_over(mouse_pos):
+                        if mouse_presses[0]:
+                            board_item.reveal()
+                            if board_item.type == BoardItemTypes.NUMBER:
+                                self.check_win_condition()
+                        else:
+                            board_item.set_flag()
 
         for board_item in self.board:
             board_item.draw(self.window, outline=True)
 
-    @staticmethod
-    def populate_board_array(number_of_bombs: int):
+    def populate_board_array(self, number_of_bombs: int):
         # Generate randomized locations for the bombs
         bomb_locations: list[tuple[int, int]] = list(
             random.sample([(i, j) for i in range(board_rows) for j in range(board_columns)], number_of_bombs))
@@ -94,7 +91,7 @@ class Game:
         # Flatten the list of lists into a single list
         flat_board_items = list(itertools.chain(*board))
 
-        return flat_board_items
+        self.board = flat_board_items
 
     def set_board_item_locations(self):
         for i in range(num_of_board_items):
