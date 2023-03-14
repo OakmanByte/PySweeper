@@ -1,5 +1,4 @@
 import itertools
-from dataclasses import dataclass
 
 import pygame
 from pygame import Surface
@@ -9,20 +8,24 @@ from GameTimer import timer
 from classes import Bomb, Number, BoardItemTypes
 import random
 
-# Initialize all the Pygame modules and prepare them for use
-from constants import WINDOW_WIDTH, board_rows, board_columns, num_of_board_items, item_size, \
-    GameState, GAME_X, GAME_Y, BLACK, TIMER_FONT
+from globals import WINDOW_WIDTH, GameState, GAME_X, GAME_Y, BLACK, TIMER_FONT, board_rows, board_columns, \
+    number_of_board_items, item_size
 from state_machine import state
 
 
-@dataclass
 class Game:
     window: Surface
-    border: pygame.Rect = None
-    board: list = None
-    number_of_bombs: int = 40
+    __board: list = None
+    number_of_bombs: int = 1
 
-    def __post_init__(self):
+    def __init__(self, window: Surface):
+        if self.number_of_bombs > number_of_board_items:
+            raise ValueError(f"You can't have more bombs than number of board squares:"
+                             f" {self.number_of_bombs} > {number_of_board_items} ")
+        self.window = window
+        self.setup()
+
+    def setup(self):
         self.populate_board_array(self.number_of_bombs)
         self.set_board_item_locations()
 
@@ -35,7 +38,7 @@ class Game:
             # left and right mouse click respectively
             if mouse_presses[0] | mouse_presses[2]:
                 mouse_pos = pygame.mouse.get_pos()
-                for board_item in self.board:
+                for board_item in self.__board:
                     if board_item.is_over(mouse_pos):
                         if mouse_presses[0]:
                             board_item.reveal()
@@ -44,7 +47,7 @@ class Game:
                         else:
                             board_item.set_flag()
 
-        for board_item in self.board:
+        for board_item in self.__board:
             board_item.draw(self.window, outline=True)
 
     def populate_board_array(self, number_of_bombs: int):
@@ -91,15 +94,15 @@ class Game:
         # Flatten the list of lists into a single list
         flat_board_items = list(itertools.chain(*board))
 
-        self.board = flat_board_items
+        self.__board = flat_board_items
 
     def set_board_item_locations(self):
-        for i in range(num_of_board_items):
+        for i in range(number_of_board_items):
             row = i // board_rows
             col = i % board_columns
             x = (col * item_size) + GAME_X
             y = (row * item_size) + GAME_Y
-            self.board[i].set_pos(x=x, y=y)
+            self.__board[i].set_pos(x=x, y=y)
 
     def render_boarder(self):
         pygame.draw.rect(self.window, BLACK, self.window.get_rect(), 2)
@@ -110,10 +113,10 @@ class Game:
 
     # TODO: Better way?
     def reset_board(self):
-        self.__post_init__()
+        self.setup()
 
     def check_win_condition(self):
-        for board_item in self.board:
+        for board_item in self.__board:
             if board_item.type == BoardItemTypes.NUMBER and board_item.hidden:
                 return False
 

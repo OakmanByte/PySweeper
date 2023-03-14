@@ -5,7 +5,8 @@ import pygame
 from pygame import Surface, Rect
 from pygame.font import Font
 
-from constants import item_size, GameState, BLACK, WHITE, BUTTON_FONT, NUMBER_BOARD_ITEM_FONT
+from globals import GameState, BLACK, WHITE, BUTTON_FONT, NUMBER_BOARD_ITEM_FONT
+from globals import item_size
 from state_machine import state
 
 
@@ -89,7 +90,7 @@ class BoardItem:
 
     def get_flag_image_and_location(self) -> Tuple[Surface, Rect]:
         # Load the image
-        flag_image = pygame.image.load('flag.svg')
+        flag_image = pygame.image.load('assets/flag.svg')
         img_rect = flag_image.get_rect(center=(self.x + self.size / 2, self.y + self.size / 2))
         # Draw the image onto the screen
         return flag_image, img_rect
