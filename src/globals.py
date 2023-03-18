@@ -9,6 +9,7 @@ class GameState(Enum):
     MENU: str = "MENU"
     GAME_OVER: str = "GAME_OVER"
     EXIT: str = "EXIT"
+    WIN: str = "WIN"
 
 
 pygame.init()
@@ -32,6 +33,7 @@ item_size = (GAME_WIDTH // board_rows)
 # Fonts
 FONT_PATH = "fonts/TranscendsGames.otf"
 TITLE_FONT = pygame.font.Font(FONT_PATH, 60)
+SUB_TITLE_FONT = pygame.font.Font(FONT_PATH, 40)
 BUTTON_FONT = pygame.font.Font(FONT_PATH, 20)
 RADIO_BUTTON_FONT = pygame.font.Font(FONT_PATH, 5)
 TIMER_FONT = pygame.font.Font(FONT_PATH, 15)

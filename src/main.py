@@ -5,17 +5,18 @@ from death_screen import DeathScreen
 from game import Game
 from main_menu import MainMenu
 from state_machine import state
-
-pygame.display.set_caption('PySweeper v0.1')
-main_window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-
-# Initialize classes
-main_menu = MainMenu(main_window, "Welcome to PySweeper!")
-game = Game(main_window)
-death_screen = DeathScreen(window=main_window, game=game)
+from win_screen import WinScreen
 
 
 def main():
+    pygame.display.set_caption('PySweeper v0.1')
+    main_window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+    # Initialize classes
+    main_menu = MainMenu(main_window, "Welcome to PySweeper!")
+    game = Game(main_window)
+    death_screen = DeathScreen(window=main_window, game=game)
+    win_screen = WinScreen(window=main_window, game=game)
+
     while state.get_state() != GameState.EXIT:
 
         # Process events if there are any, otherwise add a fallback event
@@ -35,6 +36,8 @@ def main():
                     game.run(event)
                 case GameState.GAME_OVER:
                     death_screen.render(event)
+                case GameState.WIN:
+                    win_screen.render(event)
                 case _:
                     state.set_state(GameState.EXIT)
             pygame.display.update()

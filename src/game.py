@@ -17,6 +17,7 @@ class Game:
     window: Surface
     __board: list = None
     number_of_bombs: int = 1
+    completion_time: str
 
     def __init__(self, window: Surface):
         if self.number_of_bombs > number_of_board_items:
@@ -120,4 +121,8 @@ class Game:
             if board_item.type == BoardItemTypes.NUMBER and board_item.hidden:
                 return False
 
-        state.set_state(GameState.MENU)
+        self.__set_completion_time()
+        state.set_state(GameState.WIN)
+
+    def __set_completion_time(self):
+        self.completion_time = timer.get_elapsed_time_str_formatted()
