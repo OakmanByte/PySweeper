@@ -1,4 +1,5 @@
 import itertools
+import random
 
 import pygame
 from pygame import Surface
@@ -6,8 +7,6 @@ from pygame.event import Event
 
 from GameTimer import timer
 from classes import Bomb, Number, BoardItemTypes
-import random
-
 from globals import WINDOW_WIDTH, GameState, GAME_X, GAME_Y, BLACK, TIMER_FONT, board_rows, board_columns, \
     number_of_board_items, item_size
 from state_machine import state

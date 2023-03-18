@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum
 from typing import Tuple, Optional, Callable
+
 import pygame
 from pygame import Surface, Rect
 from pygame.font import Font

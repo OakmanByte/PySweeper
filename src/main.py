@@ -1,8 +1,8 @@
 import pygame
 
-from globals import GameState, WINDOW_WIDTH, WINDOW_HEIGHT, BACKGROUND
 from death_screen import DeathScreen
 from game import Game
+from globals import GameState, WINDOW_WIDTH, WINDOW_HEIGHT, BACKGROUND
 from main_menu import MainMenu
 from state_machine import state
 from win_screen import WinScreen

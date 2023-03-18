@@ -23,7 +23,6 @@ GAME_MARGIN = 50  # Space between the game window and the main window
 GAME_X = (WINDOW_WIDTH - GAME_WIDTH) // 2  # X-coordinate of the game window
 GAME_Y = (WINDOW_HEIGHT - GAME_HEIGHT) // 2  # Y-coordinate of the game window
 
-
 # Calculated values
 board_dimension = "8x8"
 number_of_board_items = eval(board_dimension.replace("x", "*"))

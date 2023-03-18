@@ -3,8 +3,8 @@ from pygame import Surface
 from pygame.event import Event
 
 from classes import TextButton
-from globals import GameState, WINDOW_WIDTH, WINDOW_HEIGHT, BLACK, SHADOW, TITLE_FONT
 from game import Game
+from globals import GameState, WINDOW_WIDTH, WINDOW_HEIGHT, BLACK, SHADOW, TITLE_FONT
 from state_machine import state
 
 
