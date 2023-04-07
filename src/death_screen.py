@@ -3,20 +3,20 @@ from pygame import Surface
 from pygame.event import Event
 
 from classes import TextButton
-from game import Game
-from globals import GameState, WINDOW_WIDTH, WINDOW_HEIGHT, BLACK, SHADOW, TITLE_FONT
+import game
+from globals import WINDOW_WIDTH, WINDOW_HEIGHT, BLACK, SHADOW, TITLE_FONT
+import main_menu
 from state_machine import state
+from screen import Screen
 
 
-class DeathScreen:
+class DeathScreen(Screen):
     window: Surface
-    game: Game
     __buttons: [TextButton] = []
     title: str = "GAME OVER"
 
-    def __init__(self, window, game):
+    def __init__(self, window):
         self.window = window
-        self.game = game
         self.create_buttons()
 
     def render(self, event: Event):
@@ -38,13 +38,13 @@ class DeathScreen:
 
         self.__buttons.append(
             TextButton(x=button_x, y=button_y_top, button_text="Restart",
-                       on_click_func=(lambda: state.set_state(GameState.GAME))))
+                       on_click_func=(lambda: state.set_screen(game.Game(self.window)))))
         self.__buttons.append(
             TextButton(x=button_x, y=button_y_top + button_spacing, button_text="Menu",
-                       on_click_func=(lambda: state.set_state(GameState.MENU))))
+                       on_click_func=(lambda: state.set_screen(main_menu.MainMenu(self.window)))))
         self.__buttons.append(
             TextButton(x=button_x, y=button_y_top + (2 * button_spacing), button_text="Quit",
-                       on_click_func=(lambda: state.set_state(GameState.EXIT))))
+                       on_click_func=(lambda: state.exit_game())))
 
     def render_buttons(self):
         for button in self.__buttons:
