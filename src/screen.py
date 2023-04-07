@@ -6,3 +6,4 @@ class Screen(ABC):
     @abstractmethod
     def render(event: Event):
         pass
+    
