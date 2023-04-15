@@ -4,20 +4,20 @@ from pygame.event import Event
 
 from classes import TextButton
 from globals import GameState, WINDOW_WIDTH, WINDOW_HEIGHT, BLACK, SHADOW, TITLE_FONT
+from screen import Screen
 from state_machine import state
+import game
 
-
-class MainMenu:
+class MainMenu(Screen):
+    TITLE = "Welcome to PySweeper!"
     window: Surface
-    title: str
     __buttons: [TextButton] = []
 
-    def __init__(self, window: Surface, title: str):
+    def __init__(self, window: Surface):
         self.window = window
-        self.title = title
         self.create_buttons()
-        self.title_text = TITLE_FONT.render(self.title, True, BLACK)
-        self.title_text_shadow = TITLE_FONT.render(self.title, True, SHADOW)
+        self.title_text = TITLE_FONT.render(self.TITLE, True, BLACK)
+        self.title_text_shadow = TITLE_FONT.render(self.TITLE, True, SHADOW)
 
     def render(self, event: Event):
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -38,13 +38,13 @@ class MainMenu:
 
         self.__buttons.append(
             TextButton(x=button_x, y=button_y_top, button_text="Start",
-                       on_click_func=(lambda: state.set_state(GameState.GAME))))
+                       on_click_func=(lambda: state.set_screen(game.Game(self.window)))))
         self.__buttons.append(
             TextButton(x=button_x, y=button_y_top + button_spacing, button_text="Options",
-                       on_click_func=(lambda: state.set_state(GameState.GAME))))
+                       on_click_func=(lambda: state.set_screen(game.Game(self.window)))))
         self.__buttons.append(
             TextButton(x=button_x, y=button_y_top + (2 * button_spacing), button_text="Quit",
-                       on_click_func=(lambda: state.set_state(GameState.EXIT))))
+                       on_click_func=(lambda: state.exit_game())))
 
     def render_buttons(self):
         for button in self.__buttons:

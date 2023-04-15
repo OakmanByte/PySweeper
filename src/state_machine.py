@@ -2,22 +2,22 @@ from dataclasses import dataclass
 
 from GameTimer import timer
 from globals import GameState
-
-initial_state = GameState.MENU
+from screen import Screen
 
 
 @dataclass
 class StateMachine:
-    state: GameState = GameState.MENU
+    screen: Screen = None
+    game_running: bool = True
 
-    def set_state(self, _state: GameState):
-        # Reset game timer, TODO: better place to do this?
-        if _state == GameState.GAME:
-            timer.start_timer()
-        self.state = _state
+    def exit_game(self):
+        self.game_running = False
 
-    def get_state(self) -> GameState:
-        return self.state
+    def set_screen(self, screen: GameState):
+        self.screen = screen
+
+    def get_screen(self) -> GameState:
+        return self.screen
 
 
 # Global state class instance, can use dependency injection later on if it gets to complex

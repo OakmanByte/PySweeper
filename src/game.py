@@ -9,16 +9,20 @@ from GameTimer import timer
 from classes import Bomb, Number, BoardItemTypes
 from globals import WINDOW_WIDTH, GameState, GAME_X, GAME_Y, BLACK, TIMER_FONT, board_rows, board_columns, \
     number_of_board_items, item_size
+from death_screen import DeathScreen
+from win_screen import WinScreen
 from state_machine import state
+from screen import Screen
 
 
-class Game:
+class Game(Screen):
     window: Surface
     __board: list = None
     number_of_bombs: int = 1
     completion_time: str
 
     def __init__(self, window: Surface):
+        timer.start_timer()
         if self.number_of_bombs > number_of_board_items:
             raise ValueError(f"You can't have more bombs than number of board squares:"
                              f" {self.number_of_bombs} > {number_of_board_items} ")
@@ -29,7 +33,7 @@ class Game:
         self.populate_board_array(self.number_of_bombs)
         self.set_board_item_locations()
 
-    def run(self, event: Event):
+    def render(self, event: Event):
         self.render_boarder()
         self.render_timer()
 
@@ -44,6 +48,8 @@ class Game:
                             board_item.reveal()
                             if board_item.type == BoardItemTypes.NUMBER:
                                 self.check_win_condition()
+                            else:
+                                state.set_screen(DeathScreen(self.window))
                         else:
                             board_item.set_flag()
 
@@ -120,8 +126,4 @@ class Game:
             if board_item.type == BoardItemTypes.NUMBER and board_item.hidden:
                 return False
 
-        self.__set_completion_time()
-        state.set_state(GameState.WIN)
-
-    def __set_completion_time(self):
-        self.completion_time = timer.get_elapsed_time_str_formatted()
+        state.set_screen(WinScreen(self.window, timer.get_elapsed_time_str_formatted()))

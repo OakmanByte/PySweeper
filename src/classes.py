@@ -6,9 +6,8 @@ import pygame
 from pygame import Surface, Rect
 from pygame.font import Font
 
-from globals import GameState, BLACK, WHITE, BUTTON_FONT, NUMBER_BOARD_ITEM_FONT
+from globals import BLACK, WHITE, BUTTON_FONT, NUMBER_BOARD_ITEM_FONT
 from globals import item_size
-from state_machine import state
 
 
 class BoardItemTypes(Enum):
@@ -112,7 +111,6 @@ class Bomb(BoardItem):
         if not self.flagged:
             self.hidden = False
             self.color = "red"
-            state.set_state(GameState.GAME_OVER)
 
 
 @dataclass

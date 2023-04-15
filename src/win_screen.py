@@ -3,21 +3,23 @@ from pygame import Surface
 from pygame.event import Event
 
 from classes import TextButton
-from game import Game
-from globals import GameState, WINDOW_WIDTH, WINDOW_HEIGHT, BLACK, SHADOW, TITLE_FONT, SUB_TITLE_FONT
+import game
+from globals import WINDOW_WIDTH, WINDOW_HEIGHT, BLACK, SHADOW, TITLE_FONT, SUB_TITLE_FONT
 from state_machine import state
+from screen import Screen
+import main_menu
 
 
-class WinScreen:
+class WinScreen(Screen):
     window: Surface
-    game: Game
+    competion_time: str
     __buttons: [TextButton] = []
     title: str = "Congrats you won!"
     completion_time: str = ""
 
-    def __init__(self, window, game):
+    def __init__(self, window, completion_time):
         self.window = window
-        self.game = game
+        self.completion_time = completion_time
         self.create_buttons()
 
     def render(self, event: Event):
@@ -39,13 +41,13 @@ class WinScreen:
 
         self.__buttons.append(
             TextButton(x=button_x, y=button_y_top, button_text="Restart",
-                       on_click_func=(lambda: state.set_state(GameState.GAME))))
+                       on_click_func=(lambda: state.set_screen(game.Game(self.window)))))
         self.__buttons.append(
             TextButton(x=button_x, y=button_y_top + button_spacing, button_text="Menu",
-                       on_click_func=(lambda: state.set_state(GameState.MENU))))
+                       on_click_func=(lambda: state.set_screen(main_menu.MainMenu(self.window)))))
         self.__buttons.append(
             TextButton(x=button_x, y=button_y_top + (2 * button_spacing), button_text="Quit",
-                       on_click_func=(lambda: state.set_state(GameState.EXIT))))
+                       on_click_func=(lambda: state.exit_game())))
 
     def render_buttons(self):
         for button in self.__buttons:
@@ -54,7 +56,7 @@ class WinScreen:
     def render_text(self):
         # render the text using the custom font
         title_text = TITLE_FONT.render(self.title, True, BLACK)
-        completion_text = SUB_TITLE_FONT.render(self.game.completion_time, True, BLACK)
+        completion_text = SUB_TITLE_FONT.render(self.completion_time, True, BLACK)
         title_text_shadow = TITLE_FONT.render(self.title, True, SHADOW)
         self.window.blit(title_text_shadow,
                          (((WINDOW_WIDTH // 2) - title_text.get_width() // 2) + 3, (WINDOW_HEIGHT // 20) - 3))
